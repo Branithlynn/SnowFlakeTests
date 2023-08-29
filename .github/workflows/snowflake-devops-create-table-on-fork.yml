@@ -1,4 +1,4 @@
-name: snowflake-devops-create-text-file
+name: snowflake-devops-create-table-on-fork
 
 # Controls when the action will run. 
 on:
@@ -14,14 +14,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Create temp file
-        run: 
-          echo "This is a new file created on the fork." > temp.txt
-          git config --global user.email "msamuil@abv.bg"
-          git config --global user.name "AzSumToshko"
-          git add temp.txt
-          git commit -m "Add new file"
-          git push origin main
+      - name: Install SnowSQL
+        run: |
+          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.16-linux_x86_64.bash
+          chmod +x snowsql-1.2.16-linux_x86_64.bash
+          ./snowsql-1.2.16-linux_x86_64.bash
+          
+      - name: Create snowflake table
+        env: 
+          SNOWSQL_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
+          SNOWSQL_USER: ${{ secrets.SF_USER }}
+          SNOWSQL_PASSWORD: ${{ secrets.SF_PASSWORD }}
+          SNOWQSL_WAREHOUSE: ${{secrets.SD_WAREHOUSE}}
+        run: |
+          snowsql -a $SNOWSQL_ACCOUNT -u $SNOWSQL_USER -p $SNOWSQL_PASSWORD -d DEMO_DB -w $SNOWSQL_WAREHOUSE -s PUBLIC -f test_table.sql
+          
           
   deploy-snowflake-changes-job:
     runs-on: ubuntu-latest
