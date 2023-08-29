@@ -2,27 +2,16 @@ name: snowflake-devops-demo
 
 # Controls when the action will run. 
 on:
-  fork:
+  push:
     branches:
       - main
+    paths:
+      - 'migrations/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  create-file:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Create temp file
-        run: 
-          echo "This is a new file created on the fork." > temp.txt
-          git config --global user.email "msamuil@abv.bg"
-          git config --global user.name "AzSumToshko"
-          git add temp.txt
-          git commit -m "Add new file"
-          git push origin main
-          
   deploy-snowflake-changes-job:
     runs-on: ubuntu-latest
 
